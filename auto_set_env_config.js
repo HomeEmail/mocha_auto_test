@@ -10,7 +10,7 @@ const envConfig = fs.readJsonSync(filePath);
 const	req = supertest(envConfig.baseUrl);
 
 //下面到代码可根据自己到测试业务逻辑更改
-//获取系统cookie并设置项目cookie配置
+//获取系统cookie并设置项目cookie配置 多个cookie设置例如['nameOne=valueOne;nameTwo=valueTwo']
 describe('test', function () {
   // it('set cookie config', function(done){
 	// 	const _this = this;

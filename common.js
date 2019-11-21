@@ -5,7 +5,7 @@ const path = require('path');
 
 const envConfig = fs.readJsonSync(path.join(__dirname,'env.config.json'));
 const baseUrl = envConfig.baseUrl||'';
-const cookie = envConfig.cookie||'';//多个cookie=['nameOne=valueOne;nameTwo=valueTwo']
+const cookie = envConfig.cookie||'';//多个cookie设置例如['nameOne=valueOne;nameTwo=valueTwo']
 //bb = ss.replace(/kie.=..*;/,'aa'); //可以替换
 
 exports.baseUrl = baseUrl;
