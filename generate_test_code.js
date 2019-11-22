@@ -133,7 +133,7 @@ async function handleObj(rewriteConfig=true){
     throw new Error('only support swagger api 2.0');
     return 0;
   }
-  let baseUrl = obj.host+obj.basePath;
+  let baseUrl = obj.host+(obj.basePath==='/'?'':obj.basePath);
   if(obj.host.indexOf('http')<=-1){
     baseUrl='http://'+baseUrl;
   }
@@ -149,6 +149,6 @@ async function handleObj(rewriteConfig=true){
 
 async function main(){
   const apis= await handleObj(true);//ture 重写配置文件的baseUrl配置
-  createCodeFiles(apis,true);//false 同名文件不会覆盖
+  createCodeFiles(apis,false);//false 同名文件不会覆盖
 }
 main();

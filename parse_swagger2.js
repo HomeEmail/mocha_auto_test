@@ -73,20 +73,35 @@ function parse_swagger2(obj){ //obj=swagger2.0 json对象
   // console.log(apis);
   return apis;
 }
-function getObjByRef(obj,refStr){ //refStr=#/aa/bb
+const defObjs = {};
+function getObjByRef(obj,refStr,lastRefStr=''){ //refStr=#/aa/bb
   const str=refStr.replace('#/','');
-  const str1 = str.replace(/\//ig,'.');
-  const result = getObjByObjPathStr(obj,str1);
+  //console.log(str);
+  let result;
+  if(defObjs[str]){
+    result = defObjs[str];
+  }else{
+    const str1 = str.replace(/\//ig,'.');
+    result = getObjByObjPathStr(obj,str1);
+  }
   let data={};
   if(result.type=='object'){
     if(result.properties){
       for(let pro in result.properties){
         if(result.properties[pro]['$ref']){ //对象引用
-          data[pro]=getObjByRef(obj,result.properties[pro]['$ref']);
+          if(lastRefStr==result.properties[pro]['$ref']){ // swagger文档对象存在循环引用，特殊处理
+            data[pro]={};
+          }else{
+            data[pro]=getObjByRef(obj,result.properties[pro]['$ref'],refStr);
+          }
         }else if(result.properties[pro].type=='array'){ //数组
           data[pro]=[];
           if(result.properties[pro].items&&result.properties[pro].items['$ref']){
-            data[pro].push(getObjByRef(obj,result.properties[pro].items['$ref']));
+            if(lastRefStr==result.properties[pro].items['$ref']){ // swagger文档对象存在循环引用，特殊处理
+              data[pro]=[];
+            }else{
+              data[pro].push(getObjByRef(obj,result.properties[pro].items['$ref'],refStr));
+            }
           }
         } else { // 普通的
           data[pro] = result.properties[pro].type=='integer'?0:(result.properties[pro].type=='boolean'?true:result.properties[pro].type||'');
@@ -97,7 +112,11 @@ function getObjByRef(obj,refStr){ //refStr=#/aa/bb
   if(result.type=='array'){
     data=[];
     if(result.items&&result.items['$ref']){
-      data.push(getObjByRef(obj,result.items['$ref']));
+      if(lastRefStr==result.items['$ref']){ // swagger文档对象存在循环引用，特殊处理
+        data=[];
+      }else{
+        data.push(getObjByRef(obj,result.items['$ref'],refStr));
+      }
     }
   }
   return data;
